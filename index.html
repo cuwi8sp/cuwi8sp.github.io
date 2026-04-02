@@ -1,0 +1,305 @@
+import React, { useState } from 'react';
+import { 
+  User, 
+  Video, 
+  Library, 
+  Lock, 
+  Unlock,
+  ChevronRight,
+  Music,
+  Wrench
+} from 'lucide-react';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('profile');
+  
+  // 隠しページ用のステート
+  const [secretClicks, setSecretClicks] = useState(0);
+  const [isSecretUnlocked, setIsSecretUnlocked] = useState(false);
+
+  // 隠しコマンドの処理
+  const handleSecretClick = () => {
+    if (isSecretUnlocked) return;
+    
+    const newCount = secretClicks + 1;
+    setSecretClicks(newCount);
+    
+    if (newCount >= 3) {
+      setIsSecretUnlocked(true);
+      setActiveTab('secret');
+      setSecretClicks(0); // リセット
+    }
+  };
+
+  // モックデータ：動画カテゴリ
+  const videoCategories = [
+    {
+      title: "思考と心理学",
+      videos: ["INTJの思考プロセス：物事の本質をどう見抜くか", "なぜ人は『タイパ』を求めるのか？現代社会の考察"]
+    },
+    {
+      title: "プログラミング・効率化",
+      videos: ["ゼロから始めるプログラミング：論理的思考の構築", "自作Webアプリの裏側：効率化のシステム構築"]
+    },
+    {
+      title: "音楽と創作",
+      videos: ["日常の感情を音符に乗せて：作曲の裏側解説", "過去の日記を楽曲化するプロセス"]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-300 font-sans selection:bg-indigo-900 selection:text-white">
+      
+      {/* Header Section */}
+      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4 shadow-md">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold text-slate-100 tracking-wider">思考の保管庫</h1>
+            <p className="text-xs text-slate-400 mt-1">動画のまとめと、私についての少し深い話</p>
+          </div>
+          {isSecretUnlocked && (
+            <div className="text-rose-400 flex items-center text-xs border border-rose-900/50 bg-rose-950/30 px-2 py-1 rounded">
+              <Unlock size={12} className="mr-1" /> 裏モード解放中
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto p-4 pb-24">
+        
+        {/* プロフィールタブ */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            
+            <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-24 h-24 bg-slate-800 rounded-full flex items-center justify-center border-4 border-slate-700 mb-4 shadow-inner">
+                  <User size={40} className="text-slate-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-100">自己紹介</h2>
+              </div>
+
+              {/* 前略プロフィール風の一問一答 */}
+              <div className="space-y-6 text-sm md:text-base">
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 基本情報</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li><span className="text-slate-400">名前：</span>cuwi(キウイ)</li>
+                    <li><span className="text-slate-400">職業・活動：</span>在宅Webディレクター、Webクリエイター、YouTuber、作曲家</li>
+                    <li>心理学、プログラミングなど、多岐にわたるテーマを扱う</li>
+                  </ul>
+                </div>
+
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 主な経歴</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li>視聴者の心理を分析し、月収100万円を達成した実績を持つ</li>
+                    <li>飲食店でのアルバイト：おすすめ商品のPOPや手書きのメニュー表の作成を担当した経験あり</li>
+                  </ul>
+                </div>
+
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 現在の活動</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li><span className="text-slate-400">個人YTチャンネルの運用：</span>企画、動画編集、サムネ案出しまで全工程を1人で担当している</li>
+                    <li><span className="text-slate-400">クラウドソーシング（ランサーズ）：</span>Canvaを使った画像制作や、YT運用の改善提案などの案件に応募・活動している</li>
+                    <li><span className="text-slate-400">AIツールの活用：</span>NotebookLMやGeminiなどのLLMを使い、情報の要約、自己分析、作業の自動化を日々進めている</li>
+                  </ul>
+                </div>
+
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 保有スキル・得意分野</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li><span className="text-slate-400">データ分析と改善：</span>インプレやCTR、離脱ポイントなどの客観的な数値を見て、柔軟かつ論理的な改善策を提案できる</li>
+                    <li><span className="text-slate-400">デザイン制作：</span>Canvaや画像生成AIを活用し、ターゲットの目を引くサムネや画像を制作できる（noteの「みんなのフォトギャラリー」での使用実績あり）</li>
+                    <li><span className="text-slate-400">音楽と音声：</span>絶対音感を活かした耳コピや、オリジナルBGM・効果音の作曲ができる。また、感情を乗せた自身の声によるナレーションも得意</li>
+                    <li><span className="text-slate-400">書道：</span>初段の腕前を持つ</li>
+                  </ul>
+                </div>
+
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 性格・パーソナリティ</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li>MBTI：INTJをベースに、ISTPの要素も併せ持つと自己分析している</li>
+                    <li>感覚論や感情論よりも、数字や事実を重んじる「基礎データ派」</li>
+                    <li>「おばあちゃん」のような落ち着いた言動と、ボーイッシュな「元俺っ子」の側面を併せ持つ</li>
+                    <li>自称ナルシストで自己肯定感は高いが承認欲求は少なく、誰かの役に立つ作品作りに没頭するのが好き</li>
+                    <li>大人数の集まりは苦手で、1人で黙々と作業することを好む陰キャ気質</li>
+                  </ul>
+                </div>
+
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-indigo-400 font-bold block mb-2">■ 仕事や創作のスタンス</span>
+                  <ul className="text-slate-300 space-y-1 list-disc list-inside">
+                    <li>自分が前に出て目立つタレント路線ではなく、作品の良さを解説・プレゼンする「プロの裏方」や職人としての立ち位置を志向している</li>
+                    <li>感情や根性論で無理をするのではなく、AIツールや自動化の仕組みを使って効率的に問題を解決していく</li>
+                    <li>情報を全部乗せするのではなく、本当に必要な要素だけを残してあえて空白を作る「情報の蒸留（引き算）」を意識したコンテンツ作りを心がけている</li>
+                  </ul>
+                </div>
+
+                <div className="pt-2">
+                  <span className="text-indigo-400 font-bold block mb-2">■ このサイトについて</span>
+                  <p className="text-slate-300 leading-relaxed">
+                    ここはYouTubeという巨大なプラットフォームから少し離れた、私個人の書斎のような場所です。<br/>
+                    過去の動画を探しやすく整理し、動画では語りきれない深い思考や、制作の裏側を共有するために作りました。<br/>
+                    ゆっくりと、ご自身のペースで楽しんでいただければ幸いです。
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 隠しギミックへの入り口 */}
+            <div className="text-center mt-12 pt-8">
+              <p 
+                onClick={handleSecretClick}
+                className="inline-block text-xs text-slate-700 cursor-pointer select-none hover:text-slate-600 transition-colors"
+                title=""
+              >
+                ※
+              </p>
+              {secretClicks > 0 && secretClicks < 3 && (
+                <span className="block text-[10px] text-slate-600 mt-1">あと {3 - secretClicks} 回...</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 動画まとめタブ（サイトマップ的役割） */}
+        {activeTab === 'videos' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-slate-100 flex items-center">
+                <Video size={24} className="mr-2 text-blue-400" />
+                動画ライブラリ
+              </h2>
+              <p className="text-sm text-slate-400 mt-2">過去の動画をテーマごとに整理しています。気になったものからご覧ください。</p>
+            </div>
+            
+            <div className="bg-slate-900/50 border-2 border-slate-800 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <Wrench size={32} className="text-slate-500" />
+              </div>
+              <h3 className="text-lg font-medium text-slate-300 mb-2">現在準備中です</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                皆様に見やすいように動画を整理しています。<br/>
+                公開までもうしばらくお待ちください。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* プレミアムコンテンツ（販売）タブ */}
+        {activeTab === 'premium' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h2 className="text-xl font-semibold text-slate-100 flex items-center">
+              <Library size={24} className="mr-2 text-amber-400" />
+              プレミアムエリア
+            </h2>
+            <p className="text-sm text-slate-400">クリエイター活動を直接支援していただける方向けの、限定コンテンツです。</p>
+
+            <div className="bg-slate-900/50 border-2 border-slate-800 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <Lock size={32} className="text-slate-500" />
+              </div>
+              <h3 className="text-lg font-medium text-slate-300 mb-2">現在準備中です</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                こだわりの限定コンテンツを制作中です。<br/>
+                公開を楽しみにお待ちください。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 隠しページ（裏モード） */}
+        {activeTab === 'secret' && isSecretUnlocked && (
+          <div className="space-y-6 animate-in zoom-in duration-500">
+            <div className="bg-rose-950/20 border border-rose-900/50 rounded-2xl p-6 shadow-2xl shadow-rose-900/10 relative overflow-hidden">
+              {/* 背景の装飾 */}
+              <Lock size={120} className="absolute -right-10 -bottom-10 text-rose-900/20 -rotate-12" />
+              
+              <h2 className="text-2xl font-bold text-rose-400 mb-4 flex items-center relative z-10">
+                <Unlock size={24} className="mr-2" />
+                裏・プロフ
+              </h2>
+              
+              <div className="space-y-4 text-sm text-slate-300 relative z-10 leading-relaxed">
+                <p>
+                  見つけていただいてありがとうございます。<br/>
+                  ここは、表のプロフィールには書ききれない「本音/裏話」をこっそり置いておく場所です。
+                </p>
+                <div className="p-4 bg-slate-950/50 rounded-lg border-l-2 border-rose-500">
+                  <p>
+                    アナリティクスを見たらなんと8割以上がシニア層の男性だったんです。<br/>
+                    最初は戸惑いましたが、今では彼らの「深く知ろうとする探求心」にとても感謝しています。<br/>
+                    広く愛されつつも、私の芯にある「論理的思考」は曲げずに発信し続ける。それが今の私の戦い方です。
+                  </p>
+                </div>
+                <p className="text-xs text-slate-500 mt-4">
+                  ※このページを見つけたことは、他の視聴者には内緒にしておいてくださいね。
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* Bottom Navigation 
+        シニア層に配慮し、アイコンだけでなく「日本語ラベル」を必ず併記
+      */}
+      <nav className="fixed bottom-0 w-full bg-slate-900/95 backdrop-blur-md border-t border-slate-800 pb-safe z-50">
+        <div className="max-w-4xl mx-auto flex justify-around">
+          <NavButton 
+            active={activeTab === 'profile'} 
+            onClick={() => setActiveTab('profile')} 
+            icon={<User size={24} />} 
+            label="私について" 
+          />
+          <NavButton 
+            active={activeTab === 'videos'} 
+            onClick={() => setActiveTab('videos')} 
+            icon={<Video size={24} />} 
+            label="動画まとめ" 
+          />
+          <NavButton 
+            active={activeTab === 'premium'} 
+            onClick={() => setActiveTab('premium')} 
+            icon={<Library size={24} />} 
+            label="プレミアム" 
+          />
+          {/* 隠しタブボタン（解放されたら表示） */}
+          {isSecretUnlocked && (
+            <NavButton 
+              active={activeTab === 'secret'} 
+              onClick={() => setActiveTab('secret')} 
+              icon={<Unlock size={24} />} 
+              label="裏事情" 
+              isSecret={true}
+            />
+          )}
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+// ナビゲーションボタンコンポーネント
+function NavButton({ active, onClick, icon, label, isSecret }) {
+  const colorClass = isSecret 
+    ? (active ? 'text-rose-400' : 'text-slate-500 hover:text-rose-300')
+    : (active ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-300');
+
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex flex-col items-center justify-center w-full py-3 space-y-1 transition-colors ${colorClass}`}
+    >
+      <div className={`${active ? 'scale-110' : ''} transition-transform duration-200`}>
+        {icon}
+      </div>
+      {/* 文字サイズを少し大きくし、読みやすく */}
+      <span className="text-xs font-medium">{label}</span>
+    </button>
+  );
+}
