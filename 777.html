@@ -1,0 +1,691 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, Volume2, Settings2, Play, Square, Gauge, Info, Download, AlertTriangle } from 'lucide-react';
+
+// === アバター描画関数 (Canvas API) - 究極品質おまんじゅう ===
+const drawAvatar = (ctx, width, height, mouthParams, isTalking, timestamp) => {
+  const time = timestamp / 1000;
+  const { openness, widthRatio } = mouthParams;
+
+  ctx.clearRect(0, 0, width, height);
+  
+  // 完全なグリーンバック（クロマキー用）
+  ctx.fillStyle = '#00FF00';
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+  
+  const centerX = width / 2;
+  const centerY = height / 2;
+  
+  // --- アニメーション計算 (物理演算ベースのOpennessを使用) ---
+  const talkIntensity = openness; 
+  
+  // 1. 呼吸アニメーション
+  const breath = Math.sin(time * 2.5) * 0.012;
+  
+  // 2. 喋っている時の弾み＆変形アニメーション（モチモチ感を強調）
+  // openness自体がスプリングで揺れるため、ここではシンプルな連動で十分ぷるぷるになる
+  const bounceHeight = talkIntensity * 14 + (Math.sin(time * 20) * talkIntensity * 3);
+  const scaleX = 1 + (talkIntensity * 0.04) + breath;
+  const scaleY = 1 - (talkIntensity * 0.04) - breath;
+
+  // 全体のトランスフォーム適用
+  ctx.translate(centerX, centerY + 30 - bounceHeight);
+  ctx.scale(scaleX, scaleY);
+  const s = 3.8; 
+  ctx.scale(s, s);
+
+  ctx.beginPath();
+  
+  // 究極のモチモチ感グラデーション
+  const faceGradient = ctx.createRadialGradient(-15, -25, 5, 0, 10, 100);
+  faceGradient.addColorStop(0, '#ffffff');    
+  faceGradient.addColorStop(0.2, '#fff2e6');  
+  faceGradient.addColorStop(0.75, '#ffcfa3'); 
+  faceGradient.addColorStop(1, '#db8b46');    
+  
+  ctx.fillStyle = faceGradient;
+  ctx.strokeStyle = '#995c2b'; 
+  ctx.lineWidth = 1.5;
+  ctx.ellipse(0, 0, 95, 80, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // --- リムライト（逆光のふちどり） ---
+  const rimGradient = ctx.createLinearGradient(-90, -80, 90, 80);
+  rimGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+  rimGradient.addColorStop(0.4, 'rgba(255, 255, 255, 0)');
+  
+  ctx.strokeStyle = rimGradient;
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 92.5, 77.5, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // ★クオリティアップ: 喋る時の顔パーツのパララックス（立体的な上下の動き）
+  ctx.save();
+  const faceOffsetY = talkIntensity * 3; // 喋ると顔のパーツ全体が少し下に下がる
+  ctx.translate(0, faceOffsetY);
+
+  // --- 表面のツヤ（ハイライト） ---
+  const highlightOffset = talkIntensity * Math.sin(time * 25) * 2;
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.beginPath();
+  ctx.ellipse(-45, -45 + highlightOffset, 22, 10, -Math.PI/6, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.beginPath();
+  ctx.ellipse(-68, -28 + highlightOffset, 9, 5, -Math.PI/4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // --- ほっぺた (喋ると血色が良くなる) ---
+  const cheekAlpha = 0.55 + (talkIntensity * 0.3); // 感情表現
+  const drawCheek = (x) => {
+    const cheekGradient = ctx.createRadialGradient(x, 20, 0, x, 20, 24);
+    cheekGradient.addColorStop(0, `rgba(255, 90, 90, ${cheekAlpha})`);
+    cheekGradient.addColorStop(1, 'rgba(255, 90, 90, 0)');
+    ctx.fillStyle = cheekGradient;
+    ctx.beginPath(); ctx.ellipse(x, 20, 26, 16, 0, 0, Math.PI*2); ctx.fill();
+  };
+  drawCheek(-52);
+  drawCheek(52);
+
+  // --- 眉毛 ---
+  ctx.strokeStyle = '#8a5327';
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = 'round';
+  const browLift = openness * 6; 
+  
+  ctx.beginPath();
+  ctx.moveTo(-60, -35 - browLift); ctx.quadraticCurveTo(-45, -42 - browLift, -30, -38 - browLift); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(60, -35 - browLift); ctx.quadraticCurveTo(45, -42 - browLift, 30, -38 - browLift); ctx.stroke();
+
+  // --- 目 (リッチな瞳と滑らかな瞬き) ---
+  const blinkCycle = time % 4.5;
+  let eyeClosedness = 0; 
+  if (blinkCycle < 0.05) eyeClosedness = blinkCycle / 0.05; 
+  else if (blinkCycle < 0.15) eyeClosedness = 1 - ((blinkCycle - 0.05) / 0.1);
+
+  const eyeCenterY = -12;
+  const eyeHeight = 18 * (1 - eyeClosedness);
+
+  if (eyeClosedness > 0.95) {
+    // 閉じた目 (笑い目)
+    // バグ修正: moveToを追加して線が繋がらないように分離
+    ctx.strokeStyle = '#3a2517'; 
+    ctx.lineWidth = 5; 
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath(); 
+    ctx.moveTo(-65, eyeCenterY+2); ctx.quadraticCurveTo(-45, eyeCenterY-8, -25, eyeCenterY+2); 
+    ctx.stroke();
+    
+    ctx.beginPath(); 
+    ctx.moveTo(25, eyeCenterY+2); ctx.quadraticCurveTo(45, eyeCenterY-8, 65, eyeCenterY+2); 
+    ctx.stroke();
+  } else {
+    // 開いた目（瞳の描画）
+    ctx.save();
+    // 目のクリッピング領域 (バグ修正: moveToで右目にジャンプさせる)
+    ctx.beginPath();
+    ctx.ellipse(-45, eyeCenterY, 15, eyeHeight, 0, 0, Math.PI * 2);
+    ctx.moveTo(60, eyeCenterY); // 線が繋がらないように中心を移動
+    ctx.ellipse(45, eyeCenterY, 15, eyeHeight, 0, 0, Math.PI * 2);
+    ctx.clip();
+
+    // 瞳のベース（濃い茶色）
+    ctx.fillStyle = '#3a2517';
+    ctx.fillRect(-80, -40, 160, 80);
+
+    // 瞳の下部の明るいグラデーション（透明感）
+    const eyeGradLeft = ctx.createLinearGradient(-45, eyeCenterY - eyeHeight, -45, eyeCenterY + eyeHeight);
+    eyeGradLeft.addColorStop(0, 'rgba(210, 80, 40, 0)');
+    eyeGradLeft.addColorStop(1, 'rgba(210, 80, 40, 1)');
+    ctx.fillStyle = eyeGradLeft;
+    ctx.fillRect(-80, -40, 70, 80);
+
+    const eyeGradRight = ctx.createLinearGradient(45, eyeCenterY - eyeHeight, 45, eyeCenterY + eyeHeight);
+    eyeGradRight.addColorStop(0, 'rgba(210, 80, 40, 0)');
+    eyeGradRight.addColorStop(1, 'rgba(210, 80, 40, 1)');
+    ctx.fillStyle = eyeGradRight;
+    ctx.fillRect(10, -40, 70, 80);
+
+    // 瞳孔（黒目）
+    ctx.fillStyle = '#1a0d07';
+    ctx.beginPath();
+    ctx.ellipse(-45, eyeCenterY + 2, 7, eyeHeight * 0.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(45, eyeCenterY + 2, 7, eyeHeight * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ★クオリティアップ: 瞳のハイライト (揺れをなくして固定し、サブハイライトを追加して透明感をアップ)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(-49, eyeCenterY - eyeHeight*0.25, 4.8, eyeHeight * 0.35, -Math.PI/8, 0, Math.PI * 2);
+    ctx.ellipse(41, eyeCenterY - eyeHeight*0.25, 4.8, eyeHeight * 0.35, -Math.PI/8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // サブハイライト（下部の反射光）
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.beginPath();
+    ctx.ellipse(-40, eyeCenterY + eyeHeight*0.3, 2.5, eyeHeight * 0.15, Math.PI/4, 0, Math.PI * 2);
+    ctx.ellipse(50, eyeCenterY + eyeHeight*0.3, 2.5, eyeHeight * 0.15, Math.PI/4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // 目の輪郭線（アイライン）
+    // バグ修正: moveToで右目にジャンプさせる
+    ctx.strokeStyle = '#3a2517'; 
+    ctx.lineWidth = 3.5; 
+    ctx.beginPath();
+    ctx.ellipse(-45, eyeCenterY, 15, eyeHeight, 0, 0, Math.PI * 2);
+    ctx.moveTo(60, eyeCenterY); 
+    ctx.ellipse(45, eyeCenterY, 15, eyeHeight, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // --- 口 (周波数解析による変形を取り入れたシームレス変形) ---
+  const mouthY = 32;
+  ctx.strokeStyle = '#5a3a22';
+  
+  if (openness < 0.02) {
+    ctx.beginPath();
+    ctx.moveTo(-16, mouthY);
+    ctx.quadraticCurveTo(0, mouthY + 14, 16, mouthY);
+    ctx.stroke();
+  } else {
+    const o = openness; 
+    // widthRatio(横の広がり)を組み込んで、い/え の口を表現
+    const w = 12 + (10 * o) + (14 * widthRatio * o); 
+    const hDown = 6 + (32 * o); 
+    const hUp = -2 - (6 * o); 
+    
+    // ★クオリティアップ: 喉の奥 (グラデーションで奥行きを出す)
+    const throatGrad = ctx.createLinearGradient(0, mouthY + hUp, 0, mouthY + hDown);
+    throatGrad.addColorStop(0, '#2a0202');
+    throatGrad.addColorStop(1, '#5c0a0a');
+    ctx.fillStyle = throatGrad; 
+    ctx.beginPath();
+    ctx.moveTo(-w, mouthY);
+    ctx.quadraticCurveTo(0, mouthY + hUp, w, mouthY);
+    ctx.quadraticCurveTo(w, mouthY + hDown, 0, mouthY + hDown);
+    ctx.quadraticCurveTo(-w, mouthY + hDown, -w, mouthY);
+    ctx.fill();
+    ctx.stroke();
+    
+    // 歯（上部）
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(-w * 0.75, mouthY + hUp * 0.5);
+    ctx.quadraticCurveTo(0, mouthY + hUp - 2, w * 0.75, mouthY + hUp * 0.5);
+    ctx.quadraticCurveTo(w * 0.6, mouthY + hUp + 4 + (4 * o), 0, mouthY + hUp + 4 + (4 * o));
+    ctx.quadraticCurveTo(-w * 0.6, mouthY + hUp + 4 + (4 * o), -w * 0.75, mouthY + hUp * 0.5);
+    ctx.fill();
+
+    // ★クオリティアップ: 舌 (グラデーションで丸みと質感を出す)
+    const tongueY = mouthY + hDown * 0.6;
+    const tongueGrad = ctx.createLinearGradient(0, tongueY - (14 * o), 0, mouthY + hDown);
+    tongueGrad.addColorStop(0, '#ff9e9e');
+    tongueGrad.addColorStop(1, '#e65c5c');
+    ctx.fillStyle = tongueGrad;
+    ctx.beginPath();
+    ctx.moveTo(-w * 0.65, tongueY);
+    ctx.quadraticCurveTo(0, tongueY - (14 * o), w * 0.65, tongueY);
+    ctx.quadraticCurveTo(w * 0.55, mouthY + hDown - 3, 0, mouthY + hDown - 3);
+    ctx.quadraticCurveTo(-w * 0.55, mouthY + hDown - 3, -w * 0.65, tongueY);
+    ctx.fill();
+  }
+
+  ctx.restore(); // 顔パーツのtranslate用
+  ctx.restore(); // 全体のスケール・translate用
+};
+
+export default function App() {
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [sensitivity, setSensitivity] = useState(60);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  
+  // ステータス管理
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [exportProgress, setExportProgress] = useState(null);
+  
+  // 各種Ref
+  const canvasRef = useRef(null);
+  const audioRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const analyserRef = useRef(null);
+  const sourceRef = useRef(null);
+  const streamDestRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+  const stateTextRef = useRef(null);
+
+  const sensitivityRef = useRef(sensitivity);
+  const isPlayingRef = useRef(isPlaying);
+  const isExportingRef = useRef(false);
+  
+  useEffect(() => { sensitivityRef.current = sensitivity; }, [sensitivity]);
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+
+  // --- 初期設定と描画ループ ---
+  useEffect(() => {
+    let animationId;
+    
+    // 物理演算（スプリング）用の変数
+    let currentOpenness = 0;
+    let velocityOpenness = 0;
+    
+    let currentWidthRatio = 0.5;
+    let velocityWidth = 0;
+    
+    const renderLoop = (timestamp) => {
+      let targetOpenness = 0;
+      let targetWidthRatio = 0.5;
+      let isTalkingLocal = false;
+
+      if (analyserRef.current && (isPlayingRef.current || isExportingRef.current) && audioRef.current && !audioRef.current.paused) {
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        
+        // 周波数解析（低音域と高音域に分割して、あいうえおの口を推測）
+        let sum = 0;
+        let bassSum = 0;
+        let trebleSum = 0;
+        const halfCount = Math.floor(dataArray.length / 3); // 低音と高音の境界
+        
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+          if (i < halfCount) bassSum += dataArray[i];
+          else trebleSum += dataArray[i];
+        }
+        
+        const average = sum / dataArray.length;
+        const bassAvg = bassSum / halfCount;
+        const trebleAvg = trebleSum / (dataArray.length - halfCount);
+
+        const sens = sensitivityRef.current;
+        const thresholdOpen = 100 - sens;
+        const thresholdWide = (100 - sens) * 2.5;
+
+        if (average > thresholdOpen) {
+          // 全体のボリュームで「縦の開き」を決定
+          targetOpenness = (average - thresholdOpen) / (thresholdWide - thresholdOpen);
+          targetOpenness = Math.min(Math.max(targetOpenness, 0), 1.0);
+          
+          // 高音成分の強さで「横の広がり（い・え のような口）」を決定
+          const freqBalance = trebleAvg / (bassAvg || 1); 
+          targetWidthRatio = Math.min(Math.max(freqBalance * 0.7, 0), 1.0);
+
+          if (targetOpenness > 0.05) isTalkingLocal = true;
+        }
+
+        if (isExportingRef.current && audioRef.current.duration) {
+          const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+          setExportProgress(Math.min(progress, 100));
+        }
+      }
+
+      // --- 物理演算（スプリングダイナミクス）によるぷるんとした追従 ---
+      const stiffness = 0.35; // ばねの硬さ
+      const damping = 0.55;   // 減衰（ぷるぷる感の調整）
+
+      // 口の縦開き
+      const forceOpen = (targetOpenness - currentOpenness) * stiffness;
+      velocityOpenness = (velocityOpenness + forceOpen) * damping;
+      currentOpenness += velocityOpenness;
+      currentOpenness = Math.max(0, currentOpenness); // 0未満にはならないように制限
+
+      // 口の横幅
+      const forceWidth = (targetWidthRatio - currentWidthRatio) * stiffness;
+      velocityWidth = (velocityWidth + forceWidth) * damping;
+      currentWidthRatio += velocityWidth;
+      currentWidthRatio = Math.max(0, Math.min(currentWidthRatio, 1.0));
+
+      if (stateTextRef.current) {
+        stateTextRef.current.textContent = `MOUTH: ${Math.round(currentOpenness * 100)}% (W: ${Math.round(currentWidthRatio * 100)}%)`;
+      }
+
+      const animTime = audioRef.current ? audioRef.current.currentTime * 1000 : timestamp;
+
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        const mouthParams = { openness: currentOpenness, widthRatio: currentWidthRatio };
+        drawAvatar(ctx, canvasRef.current.width, canvasRef.current.height, mouthParams, isTalkingLocal, animTime);
+      }
+
+      animationId = requestAnimationFrame(renderLoop);
+    };
+
+    animationId = requestAnimationFrame(renderLoop);
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      const url = URL.createObjectURL(file);
+      setAudioUrl(url);
+      setFileName(file.name);
+      handleStop();
+      
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close();
+        audioCtxRef.current = null;
+      }
+    }
+  };
+
+  const initAudio = (muteSpeaker = false) => {
+    if (!audioCtxRef.current && audioRef.current) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtxRef.current = new AudioContext();
+      
+      analyserRef.current = audioCtxRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      
+      sourceRef.current = audioCtxRef.current.createMediaElementSource(audioRef.current);
+      sourceRef.current.connect(analyserRef.current);
+      
+      streamDestRef.current = audioCtxRef.current.createMediaStreamDestination();
+      analyserRef.current.connect(streamDestRef.current);
+    }
+    
+    if (analyserRef.current && audioCtxRef.current) {
+      try { analyserRef.current.disconnect(audioCtxRef.current.destination); } catch(e) {}
+      if (!muteSpeaker) {
+        analyserRef.current.connect(audioCtxRef.current.destination);
+      }
+    }
+    
+    if (audioCtxRef.current?.state === 'suspended') {
+      audioCtxRef.current.resume();
+    }
+  };
+
+  const handlePlayPreview = async () => {
+    if (!audioRef.current) return;
+    initAudio(false);
+    audioRef.current.playbackRate = playbackRate;
+    audioRef.current.preservesPitch = true;
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (err) {
+      console.error("Playback failed:", err);
+    }
+  };
+
+  const handleStop = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+    
+    if (isExportingRef.current) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+      isExportingRef.current = false;
+      setExportProgress(null);
+    }
+  };
+
+  // --- 動画エクスポート処理 ---
+  const handleExportVideo = async () => {
+    if (!audioRef.current || !canvasRef.current) return;
+    
+    isExportingRef.current = true;
+    setExportProgress(0);
+    
+    initAudio(true); // スピーカーミュート
+    audioRef.current.playbackRate = playbackRate;
+    audioRef.current.preservesPitch = true;
+    audioRef.current.currentTime = 0;
+    
+    const canvasStream = canvasRef.current.captureStream(60);
+    const audioStream = streamDestRef.current.stream;
+    const tracks = [...canvasStream.getVideoTracks(), ...audioStream.getAudioTracks()];
+    const combinedStream = new MediaStream(tracks);
+    
+    // ★Clipchamp対策: H.264(avc1)コーデックまたはVP8を最優先で探索する
+    const mimeTypes = [
+      'video/mp4;codecs="avc1.42E01E, mp4a.40.2"', // 最も互換性が高い(Edge/Safari等)
+      'video/mp4;codecs="avc1, mp4a.40.2"',
+      'video/mp4',
+      'video/webm;codecs="h264, opus"', 
+      'video/webm;codecs="vp8, opus"',  // VP9よりVP8の方が編集ソフトでの互換性が高い
+      'video/webm;codecs="vp9, opus"',
+      'video/webm'
+    ];
+    let selectedMimeType = '';
+    for (const mt of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mt)) {
+        selectedMimeType = mt;
+        break;
+      }
+    }
+
+    mediaRecorderRef.current = new MediaRecorder(combinedStream, { mimeType: selectedMimeType });
+    recordedChunksRef.current = [];
+    
+    mediaRecorderRef.current.ondataavailable = (e) => {
+      if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+    };
+    
+    mediaRecorderRef.current.onstop = () => {
+      const ext = selectedMimeType.includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(recordedChunksRef.current, { type: selectedMimeType || `video/${ext}` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `yukkuri_${playbackRate}x_${Date.now()}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      isExportingRef.current = false;
+      setExportProgress(null);
+    };
+    
+    // フリーズ対策: 250msごとにデータをチャンク分割
+    mediaRecorderRef.current.start(250);
+    
+    try {
+      await audioRef.current.play();
+    } catch (err) {
+      console.error("Export play failed:", err);
+      mediaRecorderRef.current.stop();
+      isExportingRef.current = false;
+      setExportProgress(null);
+    }
+  };
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
+    if (isExportingRef.current && mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+  };
+
+  const isBusy = isPlaying || exportProgress !== null;
+
+  return (
+    <div className="min-h-screen bg-neutral-900 flex flex-col items-center py-10 px-4 font-sans text-neutral-800">
+      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        
+        {/* 左側：プレビューエリア */}
+        <div className="w-full md:w-1/2 bg-neutral-100 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-neutral-200 relative">
+          
+          {/* エクスポート中のオーバーレイ */}
+          {exportProgress !== null && (
+            <div className="absolute inset-0 bg-neutral-900/90 z-20 flex flex-col items-center justify-center text-white p-8 backdrop-blur-md">
+              <Download size={48} className="text-amber-500 mb-4 animate-bounce" />
+              <h3 className="text-xl font-bold mb-2">動画を出力しています...</h3>
+              
+              <div className="w-full max-w-xs bg-neutral-700 rounded-full h-4 overflow-hidden mb-2">
+                <div 
+                  className="bg-amber-500 h-full transition-all duration-300 ease-out"
+                  style={{ width: `${exportProgress}%` }}
+                ></div>
+              </div>
+              <p className="font-mono mb-6">{Math.round(exportProgress)}%</p>
+
+              {/* フリーズ対策の警告文 */}
+              <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl flex items-start gap-3 text-sm text-red-200 max-w-xs">
+                <AlertTriangle size={20} className="shrink-0 text-red-400 mt-0.5" />
+                <p>
+                  <strong>重要:</strong><br/>
+                  出力中は他のタブを開いたり、ブラウザを最小化しないでください。アニメーションが停止し、フリーズの原因となります。
+                </p>
+              </div>
+              
+              <button 
+                onClick={handleStop}
+                className="mt-6 px-6 py-2 bg-neutral-800 hover:bg-neutral-700 rounded-full transition text-sm font-bold"
+              >
+                キャンセル
+              </button>
+            </div>
+          )}
+
+          <div className="relative w-full aspect-square rounded-xl shadow-inner overflow-hidden border-8 border-neutral-800 bg-[#00FF00]">
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={800}
+              className="w-full h-full object-contain"
+            />
+            
+            <div className="absolute top-3 left-3 bg-black/50 text-white text-xs px-2 py-1 rounded font-mono z-10">
+              <span ref={stateTextRef}>MOUTH: 0%</span>
+            </div>
+          </div>
+          
+          <div className="mt-4 text-xs text-neutral-500 flex flex-col items-start gap-2 bg-neutral-200 p-3 rounded-lg">
+            <div className="flex items-start gap-1 text-red-600 bg-red-100 p-2 rounded w-full border border-red-200">
+              <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+              <p>
+                <strong>Clipchampでエラーが出る場合:</strong><br/>
+                ブラウザ(Chrome等)が生成する動画形式と相性が悪い場合があります。その際は<strong>「Microsoft Edge」</strong>でこのアプリを開き直して出力するか、無料の動画変換サイト（Convertio等）で動画を「MP4形式」に変換してから読み込んでください。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 右側：コントロールパネル */}
+        <div className="w-full md:w-1/2 p-8 flex flex-col gap-8 bg-white overflow-y-auto max-h-[90vh]">
+          
+          <div className="border-b pb-4">
+            <h1 className="text-2xl font-bold text-neutral-800 flex items-center gap-2">
+              <Volume2 className="text-amber-500" /> リップシンクメーカー Pro
+            </h1>
+          </div>
+
+          <div className="space-y-6">
+            
+            <div className={`flex flex-col items-center p-6 border-2 border-dashed rounded-xl transition-colors ${isBusy ? 'opacity-50 pointer-events-none border-neutral-200 bg-neutral-50' : 'border-neutral-300 bg-neutral-50 hover:bg-neutral-100'}`}>
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="audio-upload"
+                disabled={isBusy}
+              />
+              <label htmlFor="audio-upload" className="cursor-pointer flex flex-col items-center gap-3 text-neutral-600 w-full text-center">
+                <div className="p-4 bg-amber-100 text-amber-600 rounded-full">
+                  <Upload size={24} />
+                </div>
+                <span className="font-semibold break-all">
+                  {fileName ? fileName : '音声ファイルを選択 (MP3, WAV等)'}
+                </span>
+              </label>
+            </div>
+
+            {audioUrl && (
+              <div className="space-y-6">
+                <audio ref={audioRef} src={audioUrl} onEnded={handleAudioEnded} className="hidden" />
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-neutral-700">
+                    <Gauge size={18} /> 再生速度
+                  </label>
+                  <div className="flex gap-2 p-1 bg-neutral-200 rounded-lg">
+                    {[1, 2].map(rate => (
+                      <button
+                        key={rate}
+                        disabled={isBusy}
+                        onClick={() => {
+                          setPlaybackRate(rate);
+                          if (audioRef.current) audioRef.current.playbackRate = rate;
+                        }}
+                        className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${playbackRate === rate ? 'bg-white shadow text-amber-600' : 'text-neutral-500 hover:bg-neutral-300'} disabled:opacity-50`}
+                      >
+                        {rate === 1 ? 'ノーマル (1.0x)' : '2倍速 (2.0x)'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm font-bold text-neutral-700">
+                    <span className="flex items-center gap-2"><Settings2 size={18} /> 反応感度</span>
+                    <span className="bg-neutral-200 px-2 py-0.5 rounded text-neutral-600">{sensitivity}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={sensitivity}
+                    onChange={(e) => setSensitivity(parseInt(e.target.value))}
+                    disabled={isBusy}
+                    className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-amber-500 disabled:opacity-50"
+                  />
+                  <div className="flex justify-between text-xs text-neutral-400">
+                    <span>鈍感</span>
+                    <span>敏感</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-neutral-100">
+                  
+                  {!isPlaying ? (
+                    <button
+                      onClick={handlePlayPreview}
+                      disabled={exportProgress !== null}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-neutral-800 text-white rounded-xl font-bold hover:bg-neutral-700 transition-colors disabled:opacity-50"
+                    >
+                      <Play size={18} /> プレビュー再生
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleStop}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 transition-colors"
+                    >
+                      <Square size={18} /> 停止
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleExportVideo}
+                    disabled={isBusy}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg text-lg"
+                  >
+                    <Download size={22} /> 動画ファイルとして出力
+                  </button>
+
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
