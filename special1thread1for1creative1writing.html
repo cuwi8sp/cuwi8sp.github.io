@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【急募】創作ギルドの初期メン募集スレ【ゲーム制作】</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00f3ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .bbs-container {
+            max-width: 900px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            background: rgba(15, 15, 15, 0.95);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-banner {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'DotGothic16', sans-serif;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.1);
+        }
+
+        .thread-post {
+            border-bottom: 1px solid #222;
+            padding: 20px;
+            transition: background 0.3s;
+        }
+
+        .thread-post:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .post-info {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        .post-number {
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        .user-id {
+            color: var(--neon-blue);
+        }
+
+        .content-box {
+            line-height: 1.8;
+            word-break: break-all;
+        }
+
+        .highlight-cyan { color: var(--neon-blue); font-weight: bold; }
+        .highlight-pink { color: var(--neon-pink); font-weight: bold; }
+        .highlight-yellow { color: var(--neon-yellow); font-weight: bold; }
+
+        /* 文字を揺らさないアニメーション（色だけ変える） */
+        .color-pulse {
+            animation: colorShift 4s infinite;
+        }
+
+        @keyframes colorShift {
+            0% { color: var(--neon-blue); }
+            33% { color: var(--neon-pink); }
+            66% { color: var(--neon-yellow); }
+            100% { color: var(--neon-blue); }
+        }
+
+        .discord-btn {
+            display: inline-block;
+            background: #5865F2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+        }
+
+        .discord-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+        }
+
+        .level-card {
+            background: #1a1a1a;
+            border-left: 4px solid var(--neon-blue);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 2ch風スクロールバー */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        .floating-action {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bbs-container shadow-2xl rounded-lg overflow-hidden">
+    <!-- スレッドタイトル -->
+    <header class="p-6 border-b-2 border-zinc-800 bg-zinc-900">
+        <h1 class="text-3xl md:text-4xl font-bold header-banner mb-2">
+            【急募】創作ギルドの初期メン募集スレ【ゲーム制作】
+        </h1>
+        <div class="flex gap-4 text-xs text-zinc-500">
+            <span>掲示板：クリエイター集合板</span>
+            <span>スレッド作成日：2024/05/20</span>
+        </div>
+    </header>
+
+    <!-- 投稿1：募集概要 -->
+    <article class="thread-post">
+        <div class="post-info">
+            <span class="post-number">1</span> ：<b class="user-name text-green-400">名無しのギルドマスター</b> ：2024/05/20(月) 12:00:00.00 <span class="user-id">ID:CREATOR001</span>
+        </div>
+        <div class="content-box">
+            <p class="text-xl mb-4 font-bold color-pulse">Discordサーバー#メンバー募集</p>
+            <p class="mb-4">
+                <a href="https://discord.gg/wP6d6jV9" class="discord-btn">
+                    招待リンク：https://discord.gg/wP6d6jV9
+                </a>
+            </p>
+            <p class="text-sm text-zinc-400 mb-6">#ゲーム制作 #創作仲間募集</p>
+            
+            <p class="mb-4">
+                ゼロから形にしていくことを目指しています。<br>
+                例：<span class="highlight-cyan">プログラマー</span>、<span class="highlight-pink">イラストレーター</span>、<span class="highlight-yellow">音楽クリエイター</span>が協力。<br>
+                完全なオリジナルのゲームを制作し、さらに<span class="highlight-cyan">動画編集者</span>が加わることで、完成した作品のPR動画を作り、SNS等を活用して効果的にファンを獲得していくことも可能です。
+            </p>
+            
+            <p class="bg-zinc-900 p-4 border border-zinc-700 rounded italic text-zinc-300 mb-4">
+                「グループの円滑な運営のため、方針の違いや摩擦のリスクを考慮し、役割分担、進捗管理、権利の扱いなどは明確なルールを後で設定します。いいねをくれた方にはDM等で声をかけるかもしれませんが、ご了承ください。拡散も大歓迎です！」
+            </p>
+
+            <h2 class="text-2xl font-bold mt-8 mb-4 border-l-4 border-pink-500 pl-4">「クリエイターさん集合！」</h2>
+            
+            <p class="mb-2 underline decoration-sky-500">募集対象：</p>
+            <ul class="list-disc list-inside mb-4 ml-4">
+                <li>動画編集</li>
+                <li>ゲーム制作</li>
+                <li>音楽</li>
+                <li>イラスト作成</li>
+                <li>プログラミング</li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- 投稿2：未経験者へのメッセージ -->
+    <article class="thread-post">
+        <div class="post-info">
+            <span class="post-number">2</span> ：<b class="user-name text-green-400">名無しのギルドマスター</b> ：2024/05/20(月) 12:05:32.15 <span class="user-id">ID:CREATOR001</span>
+        </div>
+        <div class="content-box">
+            <p class="highlight-yellow text-lg mb-4">未経験者でも大歓迎です！</p>
+            <p>
+                何かやってみたい、メンバー同士で凹凸を埋められるのであればOK。<br>
+                例えるなら、<span class="highlight-pink">「オーケストラのカスタネット担当」</span>くらいのテンションで気軽に参加してください。<br>
+                （あ、オーケストラにタンバリンはいないか…いや、カスタネットだけで参加！みたいなノリで！）
+            </p>
+            <p class="mt-4">
+                <span class="highlight-cyan">無駄な自己紹介は省きます。</span><br>
+                まずは参加してみて、どんなサーバーなのか見て判断してほしいです。<br>
+                私自身、他のサーバーで必死に自己紹介を書いたのに、中身を見たら方向性が違った…という経験が何度もあるからです。
+            </p>
+        </div>
+    </article>
+
+    <!-- 投稿3：今後の展望 -->
+    <article class="thread-post">
+        <div class="post-info">
+            <span class="post-number">3</span> ：<b class="user-name text-green-400">名無しのギルドマスター</b> ：2024/05/20(月) 12:10:11.45 <span class="user-id">ID:CREATOR001</span>
+        </div>
+        <div class="content-box">
+            <p>
+                いろんな方向性の人が来ると思うので、チャンネルを分けたり、<span class="highlight-yellow">「2号店」「新館」「別館」</span>のように、もっとニッチで制限をつけた場所を作ることも考えています。<br>
+                Discordはまだ詳しくないですが、なんとか実現したいです！
+            </p>
+            <p class="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded">
+                気になる方はお早めにフォローをお願いします（フォロワー稼ぎではありません。仲間を見つけたいだけです！）。<br>
+                X（Twitter）のフォロー、保存、リツイート、いいね大歓迎！<br>
+                気が変わったらフォロー解除して大丈夫ですし、サーバーも入り自由です。
+            </p>
+            <p class="mt-4 font-bold text-lg color-pulse">
+                「まだまだ不慣れなので、一緒にルール作りから手伝ってくれる初期メン募集中！」
+            </p>
+        </div>
+    </article>
+
+    <!-- 投稿4：活動ステップ -->
+    <article class="thread-post bg-zinc-900/50">
+        <div class="post-info">
+            <span class="post-number">4</span> ：<b class="user-name text-green-400">名無しのギルドマスター</b> ：2024/05/20(月) 12:15:00.00 <span class="user-id">ID:CREATOR001</span>
+        </div>
+        <div class="content-box">
+            <p class="mb-4 text-zinc-400">
+                独自のアイデアを形にするため、レベル1から4までの段階的な構成を考えています。
+            </p>
+            
+            <div class="level-card">
+                <span class="highlight-cyan font-bold">LEVEL 1: 自己分析・日記</span><br>
+                <span class="text-sm">日常の日記から自分を知ることからスタート。</span>
+            </div>
+            
+            <div class="level-card" style="border-left-color: var(--neon-pink);">
+                <span class="highlight-pink font-bold">LEVEL 2: アイデアの形造り</span><br>
+                <span class="text-sm">日記から生まれたアイデアをゲーム化したり、遊びで動画にする段階。</span>
+            </div>
+            
+            <div class="level-card" style="border-left-color: var(--neon-yellow);">
+                <span class="highlight-yellow font-bold">LEVEL 3: 学習と自動化</span><br>
+                <span class="text-sm">プログラミングを学ぶ。レベル2と並行して進めてもOK。</span>
+            </div>
+            
+            <div class="level-card" style="border-left-color: var(--neon-green);">
+                <span class="highlight-green font-bold text-green-400">LEVEL 4: 実践・企画</span><br>
+                <span class="text-sm">実際の企画案を立てて、チームで実践していく最終段階。</span>
+            </div>
+        </div>
+    </article>
+
+    <!-- 書き込みフォーム（フェイク） -->
+    <section class="p-6 bg-zinc-900">
+        <div class="mb-4">
+            <input type="text" placeholder="名前" class="bg-zinc-800 border border-zinc-700 p-2 rounded w-full md:w-1/3 mb-2 text-white" disabled>
+            <input type="text" placeholder="メール欄（sage推奨）" class="bg-zinc-800 border border-zinc-700 p-2 rounded w-full md:w-1/3 mb-2 text-white" disabled>
+        </div>
+        <textarea rows="4" class="bg-zinc-800 border border-zinc-700 p-4 rounded w-full text-white mb-4" placeholder="Discordへの参加をお待ちしています..." disabled></textarea>
+        <div class="text-center">
+            <button class="bg-zinc-700 text-zinc-400 px-8 py-2 rounded cursor-not-allowed font-bold">書き込む（閲覧専用）</button>
+        </div>
+    </section>
+</div>
+
+<!-- フッター -->
+<footer class="text-center p-10 text-zinc-600 text-sm">
+    <p>© 2024 Creative Guild Recruitment Thread. All Rights Reserved.</p>
+</footer>
+
+<!-- 浮遊ボタン：参加はこちら -->
+<div class="floating-action">
+    <a href="https://discord.gg/wP6d6jV9" class="discord-btn flex items-center gap-2">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.052-.102.001-.226-.1-.264a13.4 13.4 0 0 1-1.866-.892.079.079 0 0 1-.008-.132c.124-.093.245-.188.362-.285a.072.072 0 0 1 .075-.01c3.957 1.811 8.248 1.811 12.15 0a.073.073 0 0 1 .075.01c.117.097.238.192.362.285a.077.077 0 0 1-.007.132c-.585.344-1.196.643-1.833.892-.1.038-.152.162-.1.264.354.7.766 1.363 1.227 1.994a.077.077 0 0 0 .084.028 19.83 19.83 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.946-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        <span>サーバーに参加する</span>
+    </a>
+</div>
+
+</body>
+</html>
