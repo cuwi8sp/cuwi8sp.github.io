@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クリエイターさん集合！初期メン募集中</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 全体のフォント設定 */
+        body {
+            font-family: 'Zen Maru Gothic', 'M PLUS Rounded 1c', sans-serif;
+            color: #475569; /* 視覚的に優しいダークスレートグレー */
+            overflow-x: hidden;
+            background-color: #f8fafc;
+        }
+
+        /* 常に動く優しいグラデーション背景 */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-animated {
+            background: linear-gradient(-45deg, #fdfbfb, #e0c3fc, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+        }
+
+        /* グラスモーフィズム（半透明のすりガラス効果） */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(100, 100, 150, 0.1);
+        }
+
+        /* ダイナミックアニメーション定義（ホバー不要で常に動く） */
+        @keyframes float1 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1.5deg); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(-1.5deg); }
+        }
+        @keyframes float3 {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.03); }
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes bounce-text {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes rainbow-text {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* アニメーションクラス */
+        .anim-float-1 { animation: float1 4s ease-in-out infinite; }
+        .anim-float-2 { animation: float2 5.5s ease-in-out infinite; }
+        .anim-float-3 { animation: float3 3.5s ease-in-out infinite; }
+        .anim-wiggle { animation: wiggle 2.5s ease-in-out infinite; }
+        .anim-pulse { animation: pulse-soft 2s ease-in-out infinite; }
+        .anim-spin-slow { animation: spin-slow 15s linear infinite; }
+        
+        /* テキスト装飾 */
+        .rainbow-text {
+            background: linear-gradient(to right, #ff758c, #ff7eb3, #a18cd1, #8fd3f4);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: rainbow-text 4s linear infinite;
+            display: inline-block;
+        }
+        .bounce-char {
+            display: inline-block;
+            animation: bounce-text 1.5s ease-in-out infinite;
+        }
+
+        /* 装飾用背景アイコンのスタイル */
+        .bg-decoration {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen selection:bg-pink-200 selection:text-pink-900">
+
+    <!-- 動く背景レイヤー -->
+    <div class="bg-animated"></div>
+    <div id="decorations-container"></div>
+
+    <main class="relative z-10 max-w-4xl mx-auto px-4 py-12 flex flex-col gap-8">
+        
+        <!-- Section 1: 導入とリンク -->
+        <section class="glass-card rounded-[2rem] p-8 sm:p-12 text-center anim-float-1 border-t-4 border-t-blue-300">
+            <h1 class="text-3xl sm:text-4xl font-black text-blue-500 mb-6 flex items-center justify-center gap-3">
+                <i data-lucide="server" class="anim-wiggle text-blue-400 w-10 h-10"></i>
+                Discordサーバー構築中
+            </h1>
+            <a href="https://discord.gg/wP6d6jV9" target="_blank" class="inline-block bg-gradient-to-r from-blue-400 to-indigo-400 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all anim-pulse mb-6">
+                https://discord.gg/wP6d6jV9
+            </a>
+            <p class="text-lg sm:text-xl font-bold text-slate-600 leading-relaxed bg-white/50 inline-block px-6 py-3 rounded-2xl">
+                ですが、まだまだ不慣れな分際なので<br class="hidden sm:block">
+                <span class="text-pink-500 font-black text-2xl anim-wiggle inline-block mx-1">一緒にルール作りから手伝ってくれる</span><br>
+                初期メン募集中！
+            </p>
+        </section>
+
+        <!-- Section 2: タグと目的 -->
+        <section class="glass-card rounded-[2rem] p-8 anim-float-2 border-l-4 border-l-yellow-400">
+            <div class="flex flex-wrap gap-4 mb-6 justify-center sm:justify-start">
+                <span class="bg-yellow-200 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm anim-float-3">#ゲーム制作</span>
+                <span class="bg-orange-200 text-orange-800 px-4 py-2 rounded-full font-bold shadow-sm anim-wiggle">創作チームの立ち上げ</span>
+                <span class="bg-red-200 text-red-800 px-4 py-2 rounded-full font-bold shadow-sm anim-float-1">#メンバー募集 </span>
+            </div>
+            
+            <div class="bg-yellow-50/70 p-6 rounded-2xl mb-6 shadow-inner">
+                <h2 class="text-xl font-black text-yellow-600 mb-3 flex items-center gap-2">
+                    <i data-lucide="users" class="w-6 h-6"></i> 目的:
+                </h2>
+                <p class="text-lg font-bold">仲間を集めるためのグループ作り</p>
+            </div>
+
+            <p class="text-lg leading-loose mb-6 font-medium">
+                既存の枠組みや二次創作にとらわれず、独自のアイデアを<br>
+                ゼロから形にしていくことを目指し
+            </p>
+
+            <div class="bg-white/60 p-6 rounded-2xl border border-dashed border-gray-300">
+                <p class="text-lg leading-relaxed">
+                    <span class="font-black text-indigo-500 bg-indigo-100 px-2 py-1 rounded">例:</span><br>
+                    プログラマー、イラストレーター、音楽クリエイターが協力.完全なオリジナルのゲームを制作でき+動画編集者がそこに加わることで、完成した作品のPR動画を作り、SNS等を活用して効果的にファンを獲得していくことも可能に.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 3: 運営とルール -->
+        <section class="glass-card rounded-[2rem] p-8 anim-float-3 border-r-4 border-r-green-400 flex flex-col sm:flex-row gap-6 items-center">
+            <div class="bg-green-100 p-4 rounded-full anim-spin-slow shrink-0">
+                <i data-lucide="settings" class="w-12 h-12 text-green-600"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-green-700 mb-2">グループの円滑な運営:</h3>
+                <p class="text-md sm:text-lg leading-relaxed font-medium">
+                    複数のクリエイターが共同でプロジェクトを進める場合、方針の違いやコミュニケーション不足による摩擦が生じるリスクがあるため、作業の役割分担、進捗スケジュールの管理方法、生み出された作品の権利の扱いなどをあらかじめ明確なルールとして後で設定しておく.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: コミュニケーション -->
+        <section class="text-center anim-float-1">
+            <p class="bg-white/80 inline-block px-8 py-4 rounded-full shadow-md text-lg font-bold border-2 border-pink-200">
+                <i data-lucide="heart" class="inline-block text-pink-500 anim-pulse w-5 h-5 mr-1 mb-1"></i>
+                いいねを押していただいた方には DM やリプで声をかけに行くことがあるかもしれませんがご了承ください. また 拡散も大歓迎です.
+            </p>
+        </section>
+
+        <!-- Section 5: メインキャッチ & 募集内容 -->
+        <section class="glass-card rounded-[2rem] p-8 sm:p-12 text-center anim-float-2 border-y-4 border-purple-300 relative overflow-hidden">
+            <!-- 背景の装飾 -->
+            <i data-lucide="sparkles" class="absolute top-4 left-4 w-12 h-12 text-purple-200 anim-wiggle"></i>
+            <i data-lucide="star" class="absolute bottom-4 right-4 w-12 h-12 text-yellow-200 anim-pulse"></i>
+
+            <h2 id="catchphrase" class="text-3xl sm:text-5xl font-black mb-10 rainbow-text py-2">
+                <!-- JSで一文字ずつアニメーションを付与します -->
+                「クリエイターさん集合！」
+            </h2>
+
+            <div class="text-left bg-purple-50/70 p-6 sm:p-8 rounded-3xl mb-6 shadow-inner">
+                <p class="text-lg font-bold text-purple-700 mb-4 flex items-center gap-2">
+                    <i data-lucide="search" class="w-6 h-6"></i> 募集の対象となる人材:
+                </p>
+                <div class="flex flex-wrap gap-3 text-lg font-bold text-slate-700">
+                    <span class="bg-white px-3 py-1 rounded-lg shadow-sm">動画編集</span>、
+                    <span class="bg-white px-3 py-1 rounded-lg shadow-sm">ゲーム制作</span>、
+                    <span class="bg-white px-3 py-1 rounded-lg shadow-sm">音楽</span>、
+                    <span class="bg-white px-3 py-1 rounded-lg shadow-sm">イラスト作成</span>、そして
+                    <span class="bg-white px-3 py-1 rounded-lg shadow-sm text-purple-600">プログラミング</span>のスキルを持つ人.
+                </div>
+            </div>
+
+            <p class="text-xl font-black text-center bg-white/60 inline-block px-8 py-3 rounded-full">
+                活動のメイン: <span class="text-pink-500 anim-pulse inline-block">オリジナルの創作活動.</span>
+            </p>
+        </section>
+
+        <!-- Section 6: 未経験者歓迎・タンバリンの例 -->
+        <section class="bg-[#fff9e6] bg-opacity-80 backdrop-blur-md rounded-[2rem] p-8 anim-float-3 border-2 border-yellow-300 shadow-lg relative">
+            <div class="absolute -top-6 -left-6 bg-white rounded-full p-3 shadow-lg anim-wiggle">
+                <i data-lucide="music-4" class="w-8 h-8 text-yellow-500"></i>
+            </div>
+            <p class="text-lg leading-loose font-bold text-slate-700">
+                そして <span class="text-2xl text-red-500 bg-yellow-100 px-2 rounded">未経験者でも大歓迎</span> 何かやってみたいとか メンバー同士で凹凸を埋められるのであれば本当 例えで言うと <span class="text-orange-500 inline-block anim-float-1">オーケストラのタンバリン 役</span> みたいな感じでオーケストラには タンバリン いないか 演奏の中での <span class="text-blue-500 inline-block anim-wiggle">カスタネットだけで参加</span> みたいなテンションでもいいので気軽にご参加ください.
+            </p>
+            <div class="flex justify-end mt-4 gap-2 text-yellow-400">
+                <i data-lucide="drum" class="w-8 h-8 anim-pulse"></i>
+            </div>
+        </section>
+
+        <!-- Section 7: 自己紹介不要・今後の展望 -->
+        <section class="glass-card rounded-[2rem] p-8 anim-float-1 border-l-4 border-l-blue-400">
+            <div class="mb-6 relative">
+                <div class="absolute -left-3 top-0 w-1 h-full bg-blue-200 rounded-full"></div>
+                <p class="text-lg leading-relaxed font-medium pl-4">
+                    無駄な自己紹介とかは省きます まず参加してみてどんなサーバー なのかっていうのを見ていただいて判断していただきたい.」っていうのは私自身が 他のサーバーに参加してしっかり自己紹介の文章を作って いざ 内容を見てみたら方向性が違ったとかが全然あったからです.
+                </p>
+            </div>
+
+            <div class="bg-blue-50/80 p-6 rounded-2xl relative overflow-hidden">
+                <i data-lucide="store" class="absolute right-[-10px] bottom-[-10px] w-24 h-24 text-blue-100 anim-float-2"></i>
+                <p class="text-lg leading-relaxed font-medium relative z-10">
+                    また 多分いろんな様々な方向性の人が来ると思うのでいろんなチャンネルだったりとかサーバー 2号店 だったりとかを作ったりすることも考えています 今の状態では誰でも入れるようなサーバー なんですが 2号店や新館 別館 みたいな感じでそっちはもっとニッチに特化した感じでもうちょっと 制限をつけたりもすることもできます Discord はまだまだ全然 詳しくないのですがなんかしらの手段でそういうことができるといいです.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 8: CTA (Call to Action) -->
+        <section class="glass-card rounded-[2rem] p-8 sm:p-12 text-center anim-float-2 bg-gradient-to-br from-white/60 to-pink-50/60 border border-pink-200 shadow-xl">
+            <p class="text-lg font-bold mb-6">
+                もし この活動が気になる方はお早めにフォロー<br>
+                <span class="text-sm text-slate-500 font-normal">(一切 フォロワー 稼ぎではありませんよ 可能性のある仲間を見つけたいだけです)</span><br>
+                まあ  <span class="text-blue-500 font-black text-xl mx-1 anim-pulse inline-block">X のフォローして ください.</span>
+            </p>
+            
+            <p class="text-xl font-black text-pink-500 mb-8 anim-wiggle">
+                保存や リツイート いいね も大歓迎 忘れないうちに!
+            </p>
+
+            <p class="text-md font-medium text-slate-600 bg-white/50 inline-block px-6 py-3 rounded-xl mb-6">
+                またやっぱり気が変わったとかなったらお気軽にフォロー 外していただいて 大丈夫なので!
+            </p>
+
+            <div class="mt-4">
+                <p class="text-2xl font-black text-indigo-600 bg-indigo-50/80 inline-block px-8 py-4 rounded-full border-2 border-indigo-200 anim-float-3 shadow-lg flex items-center justify-center gap-3 mx-auto max-w-max">
+                    <i data-lucide="door-open" class="w-8 h-8 anim-wiggle"></i>
+                    また サーバーの方も 今のところで入り自由です.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Lucideアイコンの初期化
+        lucide.createIcons();
+
+        // 「クリエイターさん集合！」を1文字ずつ跳ねさせる処理
+        const catchphrase = document.getElementById('catchphrase');
+        const text = catchphrase.innerText;
+        catchphrase.innerHTML = '';
+        
+        [...text].forEach((char, index) => {
+            const span = document.createElement('span');
+            span.innerText = char;
+            if (char.trim() !== '') {
+                span.classList.add('bounce-char');
+                // 文字ごとにアニメーションの開始タイミングをずらす
+                span.style.animationDelay = `${index * 0.1}s`;
+            }
+            catchphrase.appendChild(span);
+        });
+
+        // 常に動く背景の装飾アイコンを動的に生成
+        const container = document.getElementById('decorations-container');
+        const bgIcons = ['gamepad-2', 'music', 'palette', 'code', 'video', 'sparkles', 'star', 'heart', 'smile'];
+        const bgColors = ['text-pink-300', 'text-blue-300', 'text-green-300', 'text-yellow-300', 'text-purple-300', 'text-orange-300'];
+        const animations = ['anim-float-1', 'anim-float-2', 'anim-float-3', 'anim-spin-slow', 'anim-pulse'];
+
+        // 画面サイズに応じてアイコンの数を決定
+        const numIcons = window.innerWidth > 768 ? 25 : 12;
+
+        for (let i = 0; i < numIcons; i++) {
+            const iconEl = document.createElement('i');
+            
+            // ランダムにプロパティを選択
+            const randomIcon = bgIcons[Math.floor(Math.random() * bgIcons.length)];
+            const randomColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+            
+            // サイズと位置をランダムに
+            const size = Math.floor(Math.random() * 32) + 24; // 24px - 56px
+            const top = Math.random() * 100; // 0 - 100%
+            const left = Math.random() * 100; // 0 - 100%
+            const delay = Math.random() * 5; // 0 - 5s
+            
+            // 属性とクラスの設定
+            iconEl.setAttribute('data-lucide', randomIcon);
+            iconEl.className = `bg-decoration ${randomColor} ${randomAnim}`;
+            iconEl.style.width = `${size}px`;
+            iconEl.style.height = `${size}px`;
+            iconEl.style.top = `${top}vh`;
+            iconEl.style.left = `${left}vw`;
+            iconEl.style.animationDelay = `-${delay}s`; // すぐにバラバラの動きになるようにマイナス値
+
+            container.appendChild(iconEl);
+        }
+
+        // 動的に追加したアイコンも描画する
+        lucide.createIcons({
+            root: container
+        });
+    </script>
+</body>
+</html>
