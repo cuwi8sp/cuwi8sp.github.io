@@ -184,7 +184,7 @@
         <h3 class="text-gray-400 text-sm font-bold mb-4">■ レスを書き込む</h3>
         
         <div class="mb-2 max-w-sm">
-            <label class="text-xs text-gray-500 mb-1 block">名前 (省略可) ※管理人は合言葉を入力</label>
+            <label class="text-xs text-gray-500 mb-1 block">名前 (省略可)</label>
             <input type="text" id="input-name" class="input-field" placeholder="名無しさん">
         </div>
         
@@ -211,19 +211,14 @@
     // ▼ 管理人用の秘密の合言葉（ここに入力した文字を名前欄に入れると赤文字の管理人になります）
     const ADMIN_SECRET = "#master2024";
 
-    // =======================================================
-    // ▼▼▼ ここにコピーした自分の合言葉を貼り付ける ▼▼▼
-    // 例: { apiKey: "AIzaSy...", authDomain: "...", ... }
-    // =======================================================
     const firebaseConfig = {
-        // --- ここから下を書き換える ---
-        apiKey: "あなたのAPIキーを入れてください",
-        authDomain: "あなたのドメインを入れてください",
-        projectId: "あなたのプロジェクトIDを入れてください",
-        storageBucket: "あなたのストレージバケットを入れてください",
-        messagingSenderId: "あなたのセンダーIDを入れてください",
-        appId: "あなたのアプリIDを入れてください"
-        // --- ここまで ---
+        apiKey: "AIzaSyCvkSi3bvexIdFHOct9GO-ZcXRG1kSd7X0",
+        authDomain: "teamthle.firebaseapp.com",
+        projectId: "teamthle",
+        storageBucket: "teamthle.firebasestorage.app",
+        messagingSenderId: "337552664314",
+        appId: "1:337552664314:web:cdc1563b69be3d34bccb43",
+        measurementId: "G-GJJDMXG0L9"
     };
 
     // Firebaseの準備
