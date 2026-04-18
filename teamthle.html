@@ -133,12 +133,17 @@
         .submit-btn:hover {
             background-color: #6b7280;
         }
+
+        .submit-btn:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
 
 <div class="bbs-container shadow-lg">
-    <!-- スレッドタイトル (遊び心のあるデザイン) -->
+    <!-- スレッドタイトル -->
     <div class="thread-title-box">
         <div class="thread-title-text">
             【急募】創作チームの初期メンバー募集スレ【ゲーム制作】
@@ -147,7 +152,7 @@
 
     <!-- レス表示エリア -->
     <div id="posts-area">
-        <!-- >>1 の書き込み -->
+        <!-- >>1 の書き込み (固定) -->
         <div class="post">
             <div class="post-header">
                 <span class="post-number">1</span> ：
@@ -169,15 +174,17 @@
                 </a>
             </div>
         </div>
+
+        <!-- 2コメ以降（データベースから読み込まれる場所） -->
+        <div id="dynamic-posts-area"></div>
     </div>
 
     <!-- 書き込みフォーム -->
     <div class="form-area">
         <h3 class="text-gray-400 text-sm font-bold mb-4">■ レスを書き込む</h3>
         
-        <!-- 名前入力欄 (Eメール欄は削除) -->
         <div class="mb-2 max-w-sm">
-            <label class="text-xs text-gray-500 mb-1 block">名前 (省略可)</label>
+            <label class="text-xs text-gray-500 mb-1 block">名前 (省略可) ※管理人は合言葉を入力</label>
             <input type="text" id="input-name" class="input-field" placeholder="名無しさん">
         </div>
         
@@ -186,17 +193,136 @@
             <textarea id="input-content" rows="4" class="input-field" placeholder="ここに書き込み内容を入力してください..."></textarea>
         </div>
         <div class="text-right mt-2">
-            <button onclick="submitPost()" class="submit-btn">書き込む</button>
+            <!-- onclickを外し、IDをつけてJavaScript側で制御するように変更 -->
+            <button id="submit-btn" class="submit-btn" disabled>データベース接続中...</button>
         </div>
-        <p class="text-xs text-gray-600 mt-2 text-right">※このフォームはテスト用です。リロードすると消えます。</p>
+        <p class="text-xs text-gray-600 mt-2 text-right">※書き込みは保存され、他の人にも見えます。</p>
     </div>
 </div>
 
-<script>
-    // 書き込み機能（フロントエンドのみで動作）
-    function submitPost() {
-        const nameInput = document.getElementById('input-name').value.trim() || '名無しさん';
+<!-- =========================================================
+     ▼ Firebase データベース連携用のプログラム (ここから下) ▼
+========================================================== -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ▼ 管理人用の秘密の合言葉（ここに入力した文字を名前欄に入れると赤文字の管理人になります）
+    const ADMIN_SECRET = "#master2024";
+
+    // =======================================================
+    // ▼▼▼ ここにコピーした自分の合言葉を貼り付ける ▼▼▼
+    // 例: { apiKey: "AIzaSy...", authDomain: "...", ... }
+    // =======================================================
+    const firebaseConfig = {
+        // --- ここから下を書き換える ---
+        apiKey: "あなたのAPIキーを入れてください",
+        authDomain: "あなたのドメインを入れてください",
+        projectId: "あなたのプロジェクトIDを入れてください",
+        storageBucket: "あなたのストレージバケットを入れてください",
+        messagingSenderId: "あなたのセンダーIDを入れてください",
+        appId: "あなたのアプリIDを入れてください"
+        // --- ここまで ---
+    };
+
+    // Firebaseの準備
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // アプリID（データベースのフォルダ名のようなもの）
+    const appId = 'guild-recruitment-board';
+    
+    let currentUser = null;
+    let postsData = [];
+    const submitBtn = document.getElementById('submit-btn');
+
+    // 匿名でログインする処理
+    const initAuth = async () => {
+        try {
+            await signInAnonymously(auth);
+        } catch (error) {
+            console.error("ログインエラー:", error);
+            submitBtn.textContent = "接続エラー";
+        }
+    };
+
+    // ログインできたらデータベースを読み込み開始
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user) {
+            submitBtn.textContent = "書き込む";
+            submitBtn.disabled = false;
+            setupListener();
+        }
+    });
+
+    // ログイン処理開始
+    initAuth();
+
+    // データベースの監視と画面表示
+    function setupListener() {
+        const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'board_posts');
+        
+        onSnapshot(postsRef, (snapshot) => {
+            postsData = [];
+            snapshot.forEach(document => {
+                postsData.push({ id: document.id, ...document.data() });
+            });
+            
+            // 古い順に並び替え
+            postsData.sort((a, b) => a.timestamp - b.timestamp);
+            renderPosts();
+        }, (error) => {
+            console.error("データ取得エラー:", error);
+        });
+    }
+
+    // 画面にレスを描画する処理
+    function renderPosts() {
+        const area = document.getElementById('dynamic-posts-area');
+        area.innerHTML = ''; 
+        
+        postsData.forEach((post, index) => {
+            const postNumber = index + 2; // 1コメは固定なので2から
+            const escapedContent = escapeHtml(post.content).replace(/\n/g, '<br>');
+            
+            // 管理人かどうかの判定
+            const nameHtml = post.isAdmin 
+                ? `<span class="post-name text-red-400 font-bold">${escapeHtml(post.name)} ★(管理人)</span>`
+                : `<span class="post-name">${escapeHtml(post.name)}</span>`;
+
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <span class="post-number">${postNumber}</span> ：
+                    ${nameHtml} ：
+                    ${escapeHtml(post.timeStr)} <span class="post-id">ID:${escapeHtml(post.bbsId)}</span>
+                </div>
+                <div class="post-content">
+                    ${escapedContent}
+                </div>
+            `;
+            area.appendChild(postDiv);
+        });
+    }
+
+    // 文字のエスケープ処理（セキュリティ対策）
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // 書き込みボタンを押した時の処理
+    submitBtn.addEventListener('click', async () => {
+        if (!currentUser) return;
+        
+        const nameInput = document.getElementById('input-name');
         const contentInput = document.getElementById('input-content');
+        
+        let rawName = nameInput.value.trim();
         const contentText = contentInput.value.trim();
         
         if (!contentText) {
@@ -204,47 +330,59 @@
             return;
         }
 
-        const postsArea = document.getElementById('posts-area');
-        const postCount = postsArea.querySelectorAll('.post').length + 1;
-        
+        submitBtn.disabled = true;
+        submitBtn.textContent = "送信中...";
+
+        let displayName = "名無しさん";
+        let isAdmin = false;
+
+        // 管理人パスワードのチェック
+        if (rawName.includes(ADMIN_SECRET)) {
+            isAdmin = true;
+            displayName = "名無しのギルドマスター";
+        } else if (rawName) {
+            displayName = rawName;
+        }
+
+        // 簡易的なID生成（ブラウザごとに記憶）
+        let myBbsId = localStorage.getItem('bbs_user_id');
+        if (!myBbsId) {
+            myBbsId = Math.random().toString(36).substring(2, 10).toUpperCase();
+            localStorage.setItem('bbs_user_id', myBbsId);
+        }
+
         // 日時の取得
         const now = new Date();
         const days = ['日', '月', '火', '水', '木', '金', '土'];
         const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}(${days[now.getDay()]}) ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.00`;
-        
-        // ランダムIDの生成
-        const idStr = Math.random().toString(36).substring(2, 10).toUpperCase();
 
-        // テキストのサニタイズと改行処理
-        const escapedContent = contentText
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n/g, '<br>');
+        // データベースに保存するデータ
+        const newPostData = {
+            name: displayName,
+            content: contentText,
+            timeStr: timeStr,
+            timestamp: Date.now(),
+            bbsId: myBbsId,
+            isAdmin: isAdmin,
+            uid: currentUser.uid
+        };
 
-        // 新しいレスのHTMLを作成
-        const newPost = document.createElement('div');
-        newPost.className = 'post';
-        newPost.innerHTML = `
-            <div class="post-header">
-                <span class="post-number">${postCount}</span> ：
-                <span class="post-name">${nameInput}</span> ：
-                ${timeStr} <span class="post-id">ID:${idStr}</span>
-            </div>
-            <div class="post-content">
-                ${escapedContent}
-            </div>
-        `;
-
-        // 画面に追加
-        postsArea.appendChild(newPost);
-        
-        // フォームを空にする
-        contentInput.value = '';
-        
-        // 追加したレスまでスクロール
-        newPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+        try {
+            const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'board_posts');
+            const newDocRef = doc(postsRef);
+            await setDoc(newDocRef, newPostData); // データベースに書き込み
+            
+            // フォームを空にする
+            contentInput.value = ''; 
+            nameInput.value = '';
+        } catch (error) {
+            console.error("書き込みエラー:", error);
+            alert("書き込みに失敗しました。");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "書き込む";
+        }
+    });
 </script>
 
 </body>
